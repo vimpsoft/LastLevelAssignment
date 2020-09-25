@@ -11,5 +11,7 @@ public class FieldPresenter : MonoBehaviour
     {
         //Тут в реактив МВП бы привязывать реактивно, но сейчас будем привязывать тем, что есть
         _map.OnNewMap += () => _fieldView.RecreateView(_map);
+        _map.OnWallAdd += _fieldView.AddWall;
+        _map.OnWallRemove += _fieldView.RemoveWall;
     }
 }
