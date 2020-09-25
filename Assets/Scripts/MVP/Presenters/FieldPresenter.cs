@@ -10,6 +10,6 @@ public class FieldPresenter : MonoBehaviour
     private void Start()
     {
         //Тут в реактив МВП бы привязывать реактивно, но сейчас будем привязывать тем, что есть
-        _map.OnNewMap.AddListener(() => _fieldView.RecreateView(_map));
+        _map.OnNewMap += () => _fieldView.RecreateView(_map);
     }
 }

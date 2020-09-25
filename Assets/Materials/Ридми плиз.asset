@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3bef2e90d79e9ed488e40a78e178b3d4, type: 3}
-  m_Name: Note
+  m_Name: "\u0420\u0438\u0434\u043C\u0438 \u043F\u043B\u0438\u0437"
   m_EditorClassIdentifier: 
   _headerText: Description
   _text: "\u0427\u0442\u043E\u0431\u044B \u043F\u043E\u043B \u043E\u0442\u043B\u0438\u0447\u0430\u043B\u0441\u044F
