@@ -342,6 +342,7 @@ MonoBehaviour:
   _clicks: {fileID: 11400000, guid: 94be0ffb27b13554bb45a4cddb68f1b3, type: 2}
   _view: {fileID: 2035016388}
   _coordinatesValue: {fileID: 11400000, guid: 1b1e1b3bb800326489faa5ac5e5824f8, type: 2}
+  _map: {fileID: 11400000, guid: cb2457574a62bad42a76cb0d6c6a7140, type: 2}
 --- !u!1 &402220722
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,6 +913,7 @@ MonoBehaviour:
   _clicks: {fileID: 11400000, guid: 94be0ffb27b13554bb45a4cddb68f1b3, type: 2}
   _view: {fileID: 2127391714}
   _coordinatesValue: {fileID: 11400000, guid: fd9da9beaf6e8fc479724eb541bb04ad, type: 2}
+  _map: {fileID: 11400000, guid: cb2457574a62bad42a76cb0d6c6a7140, type: 2}
 --- !u!1 &830395427
 GameObject:
   m_ObjectHideFlags: 0
