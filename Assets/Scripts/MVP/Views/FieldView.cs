@@ -30,9 +30,9 @@ public class FieldView : MonoBehaviour
     private GameObject createWallAt(int x, int y)
     {
         var result = Instantiate(_wallPrefab);
+        result.transform.SetParent(transform);
         result.transform.localPosition = new Vector3(x, 0, y);
         result.SetActive(true);
-        result.transform.SetParent(transform);
         return result;
     }
 
