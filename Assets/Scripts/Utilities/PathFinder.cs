@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -8,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public static class PathFinder
 {
-    private class NodeInfo
+    private struct NodeInfo
     {
         public bool IsAnObstacle; //Это препятствие
         public bool IsUtilized; //Эта нода забрана в результат
@@ -49,13 +47,13 @@ public static class PathFinder
         var currentNodeCoordinates = start;
 
         var calculatedButNotDoneNodes = new Dictionary<Vector2Int, NodeInfo>(); //Вспомогательный словарь, для уменьшения сложности алгоритма
-        calculatedButNotDoneNodes.Add(currentNodeCoordinates, infos[currentNodeCoordinates.x * map.Width + currentNodeCoordinates.y]);
+        calculatedButNotDoneNodes.Add(currentNodeCoordinates, infos[currentNodeCoordinates.x * map.Width + currentNodeCoordinates.y]); //Добавляем начальную ноду в список обработанных
         infos[currentNodeCoordinates.x * map.Height + currentNodeCoordinates.y].IsCalculated = true;
 
+        var (finishX, finishY) = finish;
         while (currentNodeCoordinates != finish)
         {
             calculateCurrentNodesCosts();
-
 
             var foundNextStep = false;
             var minFCost = float.MaxValue;
@@ -88,9 +86,8 @@ public static class PathFinder
                 infos[currentNodeCoordinates.x * map.Width + currentNodeCoordinates.y].IsDone = true;
                 calculatedButNotDoneNodes.Remove(currentNodeCoordinates);
 
-                var (currentNoeX, currentNodeY) = currentNodeCoordinates;
-                var (finishX, finishY) = finish;
-                var currentGCost = infos[currentNoeX * map.Width + currentNodeY].GCost;
+                var (currentNodeX, currentNodeY) = currentNodeCoordinates;
+                var currentGCost = infos[currentNodeX * map.Width + currentNodeY].GCost;
 
                 doNeighbour(1, 0);
                 doNeighbour(1, 1);
@@ -103,17 +100,17 @@ public static class PathFinder
 
                 void doNeighbour(int offsetX, int offsetY)
                 {
-                    var x = offsetX + currentNoeX;
+                    var x = offsetX + currentNodeX;
                     var y = offsetY + currentNodeY;
                     if (x < 0 || x >= map.Width || y < 0 || y >= map.Height)
                         return;
                     var index = x * map.Width + y;
-                    if (infos[index].IsDone) //Уже пройденные ноды не трогаем
-                        return;
+                    //if (infos[index].IsDone) //Уже пройденные ноды не трогаем
+                    //    return;
                     if (infos[index].IsAnObstacle)
                         return;
 
-                    var newGCost = currentGCost + (offsetX + offsetY == 1 ? 1f : 1.414213562f);
+                    var newGCost = currentGCost + (Mathf.Abs(offsetX) + Mathf.Abs(offsetY) == 1 ? 1f : 1.414213562f);
                     var newHCost = Mathf.Sqrt(Mathf.Pow(x - finishX, 2) + Mathf.Pow(y - finishY, 2));
                     var newFCost = newGCost + newHCost;
                     if (!infos[index].IsCalculated)
@@ -126,14 +123,15 @@ public static class PathFinder
                     {
                         //В другие проходы эти значения могу быть ниже
                         if (newGCost < infos[index].GCost)
+                        {
                             infos[index].GCost = newGCost;
-                        if (newFCost < infos[index].FCost)
                             infos[index].FCost = newFCost;
+                        }
                     }
 
                     infos[index].IsCalculated = true;
                     var coords = infos[index].Coordinates;
-                    if (!calculatedButNotDoneNodes.ContainsKey(coords))
+                    if (!infos[index].IsDone && !calculatedButNotDoneNodes.ContainsKey(coords))
                         calculatedButNotDoneNodes.Add(coords, infos[index]);
                 }
             }
@@ -147,7 +145,6 @@ public static class PathFinder
             result.Add(currentNodeCoordinates);
 
             //Проходимся по соседям
-            var minFCost = float.MaxValue;
             var minGCost = float.MaxValue;
             var minCostCoordinates = default(Vector2Int);
             for (int xOffset = -1; xOffset < 2; xOffset++)
@@ -169,15 +166,7 @@ public static class PathFinder
                         continue;
                     if (!info.IsDone)
                         continue;
-                    if (!info.IsCalculated)
-                        continue;
-                    if (info.FCost < minFCost)
-                    {
-                        minFCost = info.FCost;
-                        minGCost = info.GCost;
-                        minCostCoordinates = info.Coordinates;
-                    }
-                    else if (info.FCost == minFCost && info.GCost < minGCost)
+                    if (info.GCost < minGCost)
                     {
                         minGCost = info.GCost;
                         minCostCoordinates = info.Coordinates;
