@@ -50,21 +50,11 @@ public static class PathFinder
 
         var calculatedButNotDoneNodes = new Dictionary<Vector2Int, NodeInfo>(); //Вспомогательный словарь, для уменьшения сложности алгоритма
         calculatedButNotDoneNodes.Add(currentNodeCoordinates, infos[currentNodeCoordinates.x * map.Width + currentNodeCoordinates.y]);
+        infos[currentNodeCoordinates.x * map.Height + currentNodeCoordinates.y].IsCalculated = true;
 
         while (currentNodeCoordinates != finish)
         {
             calculateCurrentNodesCosts();
-
-
-            //currentNodeCoordinates = calculatedButNotDoneNodes
-            //    .Select(kvp => kvp.Value) //Упрощаем себе жизнь
-            //    .Where(node => !node.IsAnObstacle) //Убираем препятствия
-            //    .GroupBy(info => info.FCost) //Группируем одинаковые FCost
-            //    .OrderBy(group => group.Key) //Упорядочиваем группы по FCost
-            //    .First() //Забираем первую группу
-            //    .OrderBy(node => node.HCost) //Упорядочиваем все в ней по HCost
-            //    .First() //Забираем минимальные HCost из группы
-            //    .Coordinates; //Получаем координаты новой текущей клетки
 
 
             var foundNextStep = false;
@@ -92,29 +82,6 @@ public static class PathFinder
             if (!foundNextStep)
                 return result;
             currentNodeCoordinates = minCostCoords;
-
-            //var availableNodes = infos //Нам надо сейчас найти наиболее низкую по FCost или, если FCost равны, то по HCost координату. Поэтому мы:
-            //    .Where(info => info.IsCalculated && !info.IsDone && !info.IsAnObstacle); //Пропускаем все что не скалькулировано или уже обработано
-            //if (!availableNodes.Any()) //Если мы все попробовали и все не подошло - значит пути нет.
-            //    return result;
-            //var count = availableNodes.Count();
-            //currentNodeCoordinates = availableNodes
-            //    .GroupBy(info => info.FCost) //Группируем одинаковые FCost
-            //    .OrderBy(group => group.Key) //Упорядочиваем группы по FCost
-            //    .First() //Забираем первую группу
-            //    .OrderBy(node => node.HCost) //Упорядочиваем все в ней по HCost
-            //    .First() //Забираем минимальные HCost из группы
-            //    .Coordinates; //Получаем координаты новой текущей клетки
-
-            //var groups = availableNodes
-            //    .GroupBy(info => info.FCost);
-            //count = groups.Count();
-            //var orderedGroups = groups.OrderBy(group => group.Key);
-            //count = orderedGroups.Count();
-            //var first = orderedGroups.First();
-            //var orderedInGroup = first.OrderBy(node => node.HCost);
-            //count = orderedInGroup.Count();
-            //var resultNode = orderedInGroup.First();
 
             void calculateCurrentNodesCosts()
             {
@@ -146,7 +113,7 @@ public static class PathFinder
                     if (infos[index].IsAnObstacle)
                         return;
 
-                    var newGCost = currentGCost + (offsetX + offsetY == 1 ? 1f : 1.4f);
+                    var newGCost = currentGCost + (offsetX + offsetY == 1 ? 1f : 1.414213562f);
                     var newHCost = Mathf.Sqrt(Mathf.Pow(x - finishX, 2) + Mathf.Pow(y - finishY, 2));
                     var newFCost = newGCost + newHCost;
                     if (!infos[index].IsCalculated)
@@ -160,8 +127,6 @@ public static class PathFinder
                         //В другие проходы эти значения могу быть ниже
                         if (newGCost < infos[index].GCost)
                             infos[index].GCost = newGCost;
-                        //if (newHCost < infos[index].HCost)
-                        //    infos[index].HCost = newHCost;
                         if (newFCost < infos[index].FCost)
                             infos[index].FCost = newFCost;
                     }
@@ -180,11 +145,6 @@ public static class PathFinder
             infos[currentNodeCoordinates.x * map.Width + currentNodeCoordinates.y].IsUtilized = true;
 
             result.Add(currentNodeCoordinates);
-
-            //var neighbours = infos
-            //    .Where(info => (info.Coordinates - currentNodeCoordinates).magnitude > 0 && (info.Coordinates - currentNodeCoordinates).magnitude < 2) //Собираем всех соседей
-            //    .Where(info => !info.IsAnObstacle).ToList(); //Убираем из них препятствия
-            //var count = neighbours;
 
             //Проходимся по соседям
             var minFCost = float.MaxValue;
@@ -209,6 +169,8 @@ public static class PathFinder
                         continue;
                     if (!info.IsDone)
                         continue;
+                    if (!info.IsCalculated)
+                        continue;
                     if (info.FCost < minFCost)
                     {
                         minFCost = info.FCost;
@@ -223,15 +185,6 @@ public static class PathFinder
                 }
             }
             currentNodeCoordinates = minCostCoordinates;
-            //currentNodeCoordinates = infos
-            //    .Where(info => (info.Coordinates - currentNodeCoordinates).magnitude > 0 && (info.Coordinates - currentNodeCoordinates).magnitude < 2) //Собираем всех соседей
-            //    .Where(info => !info.IsAnObstacle) //Убираем из них препятствия
-            //    .GroupBy(info => info.FCost) //Группируем одинаковые FCost
-            //    .OrderBy(group => group.Key) //Упорядочиваем группы по FCost
-            //    .First() //Забираем первую группу
-            //    .OrderBy(info => info.GCost) //Упорядочиваем в группе уже по GCost
-            //    .First()
-            //    .Coordinates; //Pабираем координаты минимального FCost и GCost
         }
 
         return result;
